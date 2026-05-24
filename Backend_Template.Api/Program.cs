@@ -178,7 +178,7 @@ namespace Backend_Template.Api
 
                 app.MapScalarApiReference("/scalar", options =>
                 {
-                    options.WithTitle("Backend Template API"); // TODO: Cambiar título
+                    options.WithTitle("Backend_Template API");
                     options.WithTheme(ScalarTheme.DeepSpace);
                     options.WithOpenApiRoutePattern("/openapi/{documentName}.json");
                     options.AddApiKeyAuthentication("ApiKey", scheme =>
