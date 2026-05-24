@@ -1,7 +1,7 @@
 ﻿using Backend_Template.Domain.Entities;
 using Backend_Template.Domain.Enums;
 using Backend_Template.Domain.Responses;
-using Backend_Template.Infrastructure.Interfaces;
+using Backend_Template.Application.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,7 +22,7 @@ namespace Backend_Template.Infrastructure.Services
                 State = EntityState.created
             };
 
-            return Task.FromResult<ActionResponse<Entity>>(new ActionResponse<Entity>(true, null, entity));
+            return Task.FromResult(ActionResponse<Entity>.Ok(entity, "Has ejecutado una operacion!"));
         }
     }
 }

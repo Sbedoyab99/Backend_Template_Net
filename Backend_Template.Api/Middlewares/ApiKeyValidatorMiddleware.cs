@@ -1,7 +1,6 @@
 ﻿using Backend_Template.Domain.Responses;
 using Microsoft.Extensions.Configuration;
 using System.Text.Json;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace Backend_Template.Api.Middlewares
 {
@@ -9,43 +8,47 @@ namespace Backend_Template.Api.Middlewares
     /// Clase para validar el Api Key configurado en el appsettings.
     /// </summary>
     /// <param name="next"></param>
-    public class ApiKeyValidatorMiddleware(RequestDelegate next, IConfiguration configuration)
+    public class ApiKeyValidatorMiddleware(IConfiguration configuration) : IMiddleware
     {
-        private readonly RequestDelegate _next = next;
         private readonly IConfiguration _config = configuration;
 
-        public async Task InvokeAsync(HttpContext context)
+        public async Task InvokeAsync(HttpContext context, RequestDelegate next)
         {
+            if (context.Request.Path.StartsWithSegments("/scalar") || context.Request.Path.StartsWithSegments("/openapi"))
+            {
+                await next(context);
+                return;
+            }
+
             context.Response.ContentType = "application/json";
 
             if (!context.Request.Headers.TryGetValue("x-api-key", out var extractedApiKey))
             {
-                context.Response.StatusCode = StatusCodes.Status400BadRequest;
-                var response = new ApiResponse()
+                var response = new ApiResponse
                 {
                     StatusCode = StatusCodes.Status400BadRequest,
                     Message = "El header x-api-key es obligatorio."
                 };
 
-
+                context.Response.StatusCode = response.StatusCode;
                 await context.Response.WriteAsync(JsonSerializer.Serialize(response));
                 return;
             }
 
             if (!string.Equals(extractedApiKey, _config["ApiKey"], StringComparison.Ordinal))
             {
-                context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-                var response = new ApiResponse()
+                var response = new ApiResponse
                 {
-                    StatusCode = StatusCodes.Status400BadRequest,
+                    StatusCode = StatusCodes.Status401Unauthorized,
                     Message = "La clave x-api-key proporcionada no es válida."
                 };
 
+                context.Response.StatusCode = response.StatusCode;
                 await context.Response.WriteAsync(JsonSerializer.Serialize(response));
                 return;
             }
 
-            await _next(context);
+            await next(context);
         }
     }
 }
