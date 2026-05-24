@@ -1,50 +1,48 @@
-﻿namespace Backend_Template.Domain.Responses
+﻿using Microsoft.AspNetCore.Http;
+
+namespace Backend_Template.Domain.Responses
 {
-    public class ActionResponse<T>(int statusCode, bool success, string? message = null, T? data = default)
+    public class ActionResponse<T>(bool success, string? message, T? data, int statusCode = StatusCodes.Status200OK)
     {
-        public const int StatusOk = 200;
-        public const int StatusCreated = 201;
-        public const int StatusBadRequest = 400;
-        public const int StatusUnauthorized = 401;
-        public const int StatusNotFound = 404;
-        public const int StatusInternalServerError = 500;
+        public const int StatusOk = StatusCodes.Status200OK;
+        public const int StatusCreated = StatusCodes.Status201Created;
+        public const int StatusBadRequest = StatusCodes.Status400BadRequest;
+        public const int StatusUnauthorized = StatusCodes.Status401Unauthorized;
+        public const int StatusForbidden = StatusCodes.Status403Forbidden;
+        public const int StatusNotFound = StatusCodes.Status404NotFound;
+        public const int StatusConflict = StatusCodes.Status409Conflict;
+        public const int StatusInternalServerError = StatusCodes.Status500InternalServerError;
 
         public int StatusCode { get; set; } = statusCode;
-        public bool Success { get; set; } = success;
+        public bool WasSuccess { get; set; } = success;
         public string? Message { get; set; } = message;
-        public T? Data { get; set; } = data;
+        public T? Result { get; set; } = data;
 
-        public bool WasSuccess
-        {
-            get => Success;
-            set => Success = value;
-        }
-
-        public T? Result
-        {
-            get => Data;
-            set => Data = value;
-        }
-
-        public static ActionResponse<T> Ok(T? data = default, string? message = null)
-            => new(StatusOk, true, message, data);
+        public static ActionResponse<T> Ok(T data, string? message = null)
+            => new(true, message, data, StatusOk);
 
         public static ActionResponse<T> Created(T? data = default, string? message = null)
-            => new(StatusCreated, true, message, data);
+            => new(true, message, data, StatusCreated);
 
-        public static ActionResponse<T> BadRequest(string? message = null, T? data = default)
-            => new(StatusBadRequest, false, message, data);
+        public static ActionResponse<T> BadRequest(string message)
+            => new(false, message, default(T), StatusBadRequest);
 
-        public static ActionResponse<T> Unauthorized(string? message = null, T? data = default)
-            => new(StatusUnauthorized, false, message, data);
+        public static ActionResponse<T> Unauthorized(string message)
+            => new(false, message, default(T), StatusUnauthorized);
 
-        public static ActionResponse<T> NotFound(string? message = null, T? data = default)
-            => new(StatusNotFound, false, message, data);
+        public static ActionResponse<T> Forbidden(string message)
+            => new(false, message, default(T), StatusForbidden);
 
-        public static ActionResponse<T> InternalServerError(string? message = null, T? data = default)
-            => new(StatusInternalServerError, false, message, data);
+        public static ActionResponse<T> NotFound(string message)
+            => new(false, message, default(T), StatusNotFound);
 
-        public static ActionResponse<T> Create(int statusCode, bool success, T? data = default, string? message = null)
-            => new(statusCode, success, message, data);
+        public static ActionResponse<T> Conflict(string message)
+            => new(false, message, default(T), StatusConflict);
+
+        public static ActionResponse<T> InternalServerError(string message)
+            => new(false, message, default(T), StatusInternalServerError);
+
+        public static ActionResponse<T> Code(int statusCode, bool success, T? data = default, string? message = null)
+            => new(success, message, data, statusCode);
     }
 }

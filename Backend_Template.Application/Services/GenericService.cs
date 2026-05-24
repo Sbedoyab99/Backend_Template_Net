@@ -2,11 +2,6 @@
 using Backend_Template.Domain.Entities;
 using Backend_Template.Domain.Enums;
 using Backend_Template.Domain.Responses;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Backend_Template.Application.Services
 {

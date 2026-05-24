@@ -2,12 +2,10 @@ using Backend_Template.Api.Middlewares;
 using Backend_Template.Domain.Responses;
 using Backend_Template.Infrastructure.Data;
 using Microsoft.AspNetCore.Diagnostics;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Backend_Template.Application.Interfaces;
 using Backend_Template.Infrastructure.Services;
 using Scalar.AspNetCore;
-using Microsoft.Extensions.DependencyInjection;
 using System.Text.Json;
 using Serilog;
 using System.Text.Json.Serialization;
@@ -26,14 +24,14 @@ namespace Backend_Template.Api
                 .Enrich.FromLogContext()
                 .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {SourceContext} - {Message:lj}{NewLine}{Exception}")
                 .WriteTo.File(
-                    path: "logs/log-.txt", 
-                    rollingInterval: RollingInterval.Day, 
+                    path: "logs/log-.txt",
+                    rollingInterval: RollingInterval.Day,
                     retainedFileCountLimit: 30,
                     outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {SourceContext} - {Message:lj}{NewLine}{Exception}"
                 )
                 .CreateLogger();
 
-            var builder = WebApplication.CreateBuilder(args);
+            WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
             builder.Host.UseSerilog();
 
@@ -112,7 +110,7 @@ namespace Backend_Template.Api
                 });
             });
 
-            var app = builder.Build();
+            WebApplication app = builder.Build();
 
             app.UseSerilogRequestLogging();
             Log.Information("Backend Template API started in {Environment}", app.Environment.EnvironmentName);
@@ -149,7 +147,7 @@ namespace Backend_Template.Api
 
             app.UseStatusCodePages(async statusCodeContext =>
             {
-                var context = statusCodeContext.HttpContext;
+                HttpContext context = statusCodeContext.HttpContext;
 
                 if (context.Response.HasStarted)
                 {
@@ -199,12 +197,17 @@ namespace Backend_Template.Api
 
             app.MapControllers();
 
-            try {
+            try
+            {
                 Log.Information("Starting web host");
                 app.Run();
-            } catch (Exception ex) {
+            }
+            catch (Exception ex)
+            {
                 Log.Fatal(ex, "Host terminated unexpectedly");
-            } finally {
+            }
+            finally
+            {
                 Log.CloseAndFlush();
             }
         }

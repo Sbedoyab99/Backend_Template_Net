@@ -1,5 +1,4 @@
 ﻿using Backend_Template.Domain.Responses;
-using Microsoft.Extensions.Configuration;
 using System.Text.Json;
 
 namespace Backend_Template.Api.Middlewares
